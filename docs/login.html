@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GreenWay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
+    
+    <style>
+    /* Set the size of the div element that contains the map */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins',sans-serif;
+    }
+    body{
+        background: url("img1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.3);
+        height: 100vh;
+        width: 100vw;
+        z-index: 2;
+    }
+
+    .con {
+        height: 415px;
+        width: 350px;
+        background: white;
+        box-shadow: 0 0 5px black;
+        border-radius: 10px;
+        z-index: 5;
+        padding: 10px;
+    }
+    .head {
+        text-align: center;
+        font-size: 40px;
+        font-weight: 700;
+    }
+
+    .head2 {
+        text-align: center;
+        margin: 10px 0;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=submit] {
+        width: 100%;
+        background-color: #008000;
+        color: white;
+        padding: 12px 20px;
+        margin: 6px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #005f00;
+    }
+
+    .logbut {
+        width: 100%;
+        background-color: #0d0e0d;
+        color: white;
+        padding: 12px 20px;
+        margin: 6px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+    }
+    .logbut:hover {
+        background-color: black;
+    }
+</style>
+</head>
+<body>
+    <div class="cover"></div>
+    <div class="con">
+        <p class="head">Green<span style="color:green;">Way</span></p>
+        <h3 class="head2">Login</h3>
+        <form action="" id="my-form" onsubmit="return false">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="John_Drol" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Password" required>
+
+          <input type="submit" value="Submit">
+      </form>
+
+      <div class="logbut">Don't have an account?</div>
+
+  </div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+
+    $(".logbut").click(function(){
+        window.location.href="index.html";
+    })
+
+    $("#my-form").on("submit", async function () {
+            var body = {
+                "username":$("#username").val(),
+                "password":$("#password").val()
+            }
+            var res=await axios.post("https://greenway.azurewebsites.net/api/login",body).catch(function (error) {
+            alert(error.response.data.message);
+
+         });
+            if(res.data.message=="success"){
+                sessionStorage.setItem("username", $("#username").val());
+                window.location.href="home.html";
+            }
+        })
+
+  </script>
+</body>
+</html>
