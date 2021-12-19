@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GreenWay</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
@@ -213,7 +215,7 @@
 
     .infocon {
         height: 300px;
-        width: 400px;
+        width: 430px;
         background: white;
         position: absolute;
         bottom: 10px;
@@ -235,22 +237,23 @@
         border-radius: 6px;
         box-shadow: 0 0 3px black;
         width: 100%;
-        height: 85px;
+        min-height: 85px;
     }
 
     .infobut {
         float: right;
         background: black;
         color: white;
-        padding: 5px 15px;
+        padding: 5px 13px;
         cursor: pointer;
+        font-size: 12px;
         border-radius: 5px;
         margin: 10px 7px;
     }
 
     .rinfo {
         float: left;
-        font-size: 13px;
+        font-size: 12px;
         padding-left: 10px;
         padding-bottom: 10px;
     }
@@ -271,6 +274,48 @@
         }
     }
 
+    @media (max-width: 500px) {
+        .navcon {
+            padding-top: 20px;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-around;
+            height: 24vh;
+            padding-left: 10px;
+        }
+        #map {
+            height: 76vh;
+        }
+        .inpcon {
+            width: 200px;
+            display: block;
+            margin-right: 10px;
+        }
+        .inp {
+            width: 140px;
+            padding: 10px;
+            font-size: 10px;
+            margin: 0;
+            margin-right: 0px;
+        }
+        select {
+            position: absolute;
+            top:16vh;
+            left: 10px;
+            margin-right: 2px !important;
+        }
+        .getbut {
+            position: absolute;
+            bottom:1.5vh;
+            right: 10px;
+        }
+        .hamburger {
+            top: 15px;
+            left: unset;
+            right: 15px;
+        }
+    }
+
 
     @keyframes spin {
         0% { transform: rotate(0deg); }
@@ -281,7 +326,7 @@
 </head>
 <body>
     <nav class="navcon">
-       <ul class="menu">
+     <ul class="menu">
         <li><a class="menuItem" href="home.html"><i class="fas fa-home"></i> Home</a></li>
         <li><a class="menuItem" href="profile.html"><i class="fas fa-user-circle"></i> Profile</a></li>
         <li><a class="menuItem logitem" href="#" onclick="logoutfuc()">Logout <i class="fas fa-sign-out-alt"></i></a></li>
@@ -321,26 +366,26 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 
-            getinfo(name);
-        async function getinfo(name) {
-            var name=sessionStorage.getItem("username");
-            if(name==null)
-                window.location.href="login.html";
-            body = {
-                "username":name
-            }
-            var res=await axios.post("https://greenway.azurewebsites.net/userinfo",body).catch(function (error) {
-                alert(error.response.data.message);
-            })
-            var veh=res.data.data.vehicles;
-            for(i=0;i<veh.length;i++)
-                $("#cars").append('<option value="'+veh[i].vid+'">'+veh[i].make+' - '+veh[i].model+'</option>');
-        }
-
-        function logoutfuc() {
-            sessionStorage.removeItem("username")
+    getinfo(name);
+    async function getinfo(name) {
+        var name=sessionStorage.getItem("username");
+        if(name==null)
             window.location.href="login.html";
+        body = {
+            "username":name
         }
+        var res=await axios.post("https://greenway.azurewebsites.net/userinfo",body).catch(function (error) {
+            alert(error.response.data.message);
+        })
+        var veh=res.data.data.vehicles;
+        for(i=0;i<veh.length;i++)
+            $("#cars").append('<option value="'+veh[i].vid+'">'+veh[i].make+' - '+veh[i].model+'</option>');
+    }
+
+    function logoutfuc() {
+        sessionStorage.removeItem("username")
+        window.location.href="login.html";
+    }
 
     const menu = document.querySelector(".menu");
     const menuItems = document.querySelectorAll(".menuItem");
@@ -374,6 +419,8 @@
         var x = res.data.results[0].geometry.location;
         return x;
     }
+    markers = [];
+    flightPaths=[];
     initMap();
     function initMap() {
         const map = new google.maps.Map(
@@ -399,6 +446,15 @@
           map.setCenter(new google.maps.LatLng(lat, lng));
       }
       $(".getbut").click(async function(){
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
+        for (let i = 0; i < flightPaths.length; i++) {
+            flightPaths[i].setMap(null);
+        }
+        markers = [];
+        flightPaths=[];
         var from = $("#frominp").val();
         if(from===""){
             alert("Please enter starting loacation");
@@ -428,16 +484,18 @@
         map.setCenter(new google.maps.LatLng(fromcoor.lat,fromcoor.lng));
 
         $(".infocon").css({"visibility":"visible"});
-        new google.maps.Marker({
+        var marker = new google.maps.Marker({
             position: fromcoor,
             map,
             title: from,
         });
-        new google.maps.Marker({
+        markers.push(marker);
+        marker =new google.maps.Marker({
             position: tocoor,
             map,
             title: to,
         });
+        markers.push(marker);
         color=["steelblue","green","red","yellow","orange","brown","purple"];
         $(".infocon").empty();
         $(".infocon").append("<h3>All Paths</h3><hr>");
@@ -453,6 +511,7 @@
             });
 
             flightPath.setMap(map);
+            flightPaths.push(flightPath);
         }
 
         $(".infobut").click(function(){
@@ -462,7 +521,7 @@
                 way+=""+rdata[ind].steps[i].lat+","+rdata[ind].steps[i].lng+"|";
             }
             window.location.href="https://www.google.com/maps/dir/?api=1&origin="+fromcoor.lat+","+fromcoor.lng+"&destination="+tocoor.lat+","+tocoor.lng+"&travelmode=driving&waypoints="+way+"";
-      })
+        })
 
     })
   }
